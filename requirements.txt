@@ -1,0 +1,5 @@
+discord.py
+pillow
+aiohttp
+python-dotenv
+flask
