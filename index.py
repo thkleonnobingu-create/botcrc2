@@ -6,6 +6,7 @@ import os
 import aiohttp
 import io
 import re
+import signal
 from datetime import timedelta
 from PIL import Image, ImageDraw, ImageFont
 from dotenv import load_dotenv
@@ -475,3 +476,23 @@ bot.tree.add_command(group)
 if __name__ == "__main__":
     keep_alive()
     bot.run(TOKEN)
+
+# Thêm vào cuối file, trước bot.run(TOKEN)
+async def close_bot():
+    await bot.close()
+
+def handler(signum, frame):
+    print("Stopping bot...")
+    bot.loop.create_task(close_bot())
+
+signal.signal(signal.SIGINT, handler)
+signal.signal(signal.SIGTERM, handler)
+
+# Sau đó mới chạy bot
+try:
+    bot.run(TOKEN)
+except discord.errors.HTTPException as e:
+    if e.status == 429:
+        print("BỊ RATE LIMIT RỒI! Hãy đợi 30-60 phút rồi khởi động lại.")
+    else:
+        raise e
